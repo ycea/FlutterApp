@@ -1,4 +1,3 @@
-import 'dart:math';
 
 void main() async {
   SequenceGenerator seq = new SequenceGenerator(12, -1);
@@ -28,10 +27,9 @@ class SequenceGenerator {
   Future<void> generate(int length) async {
     sequence.clear();
     int lastElement = start;
-    for (int i = 0; i < length; i++) {
-      await addElement(sequence, lastElement);
-      lastElement += step;
-    }
+    await addElement(sequence, lastElement);
+    lastElement += step;
+    for (int i = 0; i < length; i++) {}
   }
 
   Future<void> addElement<T>(List<T> collection, T element) async {
