@@ -1,4 +1,3 @@
-
 void main() async {
   SequenceGenerator seq = new SequenceGenerator(12, -1);
   await seq.generate(10);
