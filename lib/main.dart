@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Савинов Р. Д. ПИбд-32'),
+      home: const MyHomePage(title: 'Manga App. Supported by MangaDex API'),
     );
   }
 }
@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(backgroundColor: _color, title: Text(widget.title)),
-      body: const WidgetBody(),
+      body: WidgetBody(),
     );
   }
 }

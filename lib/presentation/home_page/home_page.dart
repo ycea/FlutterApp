@@ -2,40 +2,33 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_test_app/data/repositories/manga_repository.dart';
+import 'package:flutter_test_app/data/repositories/mock_repository.dart';
 
 import '../../domain/models/card.dart';
 import '../details_page/MangaDetails.dart';
 
 part './card.dart';
 
-class WidgetBody extends StatelessWidget {
-  const WidgetBody({super.key});
+class WidgetBody extends StatefulWidget {
+  @override
+  State<WidgetBody> createState() => _WidgetBodyState();
+}
+
+class _WidgetBodyState extends State<WidgetBody> {
+  final MangaRepository repo = MangaRepository();
+  final TextEditingController searchController = TextEditingController();
+
+  late Future<List<CardData>?> data;
+
+  @override
+  void initState() {
+    super.initState();
+    data = repo.loadData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final data = [
-      CardData(
-        "Атака титанов",
-        description:
-            "Сюжет разворачивается в мире, где остатки человечества живут за огромными стенами, спасаясь от титанов — гигантов, пожирающих людей. Главный герой, Эрен Йегер, вместе с друзьями Микасой и Армином вступает в Разведкорпус, чтобы сразиться с титанами и выяснить их тайну.",
-        imageUrl:
-            "https://static.wikia.nocookie.net/shingekinokyojin/images/d/d4/SnK_-_Manga_Volume_1.png/revision/latest/scale-to-width-down/1000?cb=20210116221213&path-prefix=ru",
-      ),
-      CardData(
-        "Фрирен: провожающая в последний путь",
-        description:
-            "История рассказывает о эльфийке Фрирен, маге, которая входила в отряд героев, победивших Короля демонов. В отличие от людей, её жизнь почти бесконечна, и потому она воспринимала десятилетие приключений с товарищами как «короткий миг».",
-        imageUrl:
-            "https://static.wikia.nocookie.net/frieren/images/0/0e/Volume_2_ENG.png/revision/latest?cb=20241218020401&path-prefix=ru",
-      ),
-      CardData(
-        "Берсерк",
-        description:
-            "«Берсерк» — тёмное фэнтези-эпопея, одна из самых культовых и узнаваемых манг в мире. Главный герой — Гатс (Guts), наёмник с трагическим прошлым. Он сражается огромным мечом, преодолевая нечеловеческие испытания. Сюжет исследует темы судьбы, борьбы с внутренними и внешними демонами, дружбы и предательства.",
-        imageUrl:
-            "https://static.wikia.nocookie.net/berserk/images/d/de/V1-Cover-Manga.jpg/revision/latest?cb=20210211210752&path-prefix=ru",
-      ),
-    ];
     void showSnackBar(BuildContext context, String title, bool isLiked) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,21 +51,48 @@ class WidgetBody extends StatelessWidget {
       );
     }
 
-    return Center(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: data
-              .map(
-                (card) => _Card.fromData(
-                  card,
-                  onLike: showSnackBar,
-                  onTap: () => _navToDetails(context, card),
-                ),
-              )
-              .toList(),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: CupertinoSearchTextField(
+              controller: searchController,
+              onSubmitted: (search) {
+                setState(() {
+                  data = repo.loadData(query: search);
+                });
+              },
+            ),
+          ),
         ),
-      ),
+        Expanded(
+          child: Center(
+            child: FutureBuilder(
+              future: data,
+              builder: (context, asyncSnapshot) {
+                return SingleChildScrollView(
+                  child: asyncSnapshot.hasData
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: asyncSnapshot.data!
+                              .map(
+                                (data) => _Card.fromData(
+                                  data,
+                                  onLike: showSnackBar,
+                                  onTap: () => _navToDetails(context, data),
+                                ),
+                              )
+                              .toList(),
+                        )
+                      : const CircularProgressIndicator(),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

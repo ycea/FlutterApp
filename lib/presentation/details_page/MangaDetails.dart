@@ -25,7 +25,6 @@ class MangaDetail extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ClipRRect(

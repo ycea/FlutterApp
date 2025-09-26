@@ -100,8 +100,8 @@ class _CardState extends State<_Card> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: SizedBox(
-                        width: double.infinity,
-
+                        width: 300,
+                        height: 300,
                         child: Image.network(
                           widget.imageUrl ?? "",
                           fit: BoxFit.cover,
