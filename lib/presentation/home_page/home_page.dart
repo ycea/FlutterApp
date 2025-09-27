@@ -2,8 +2,12 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test_app/data/repositories/manga_repository.dart';
 import 'package:flutter_test_app/data/repositories/mock_repository.dart';
+import 'package:flutter_test_app/presentation/home_page/bloc/bloc.dart';
+import 'package:flutter_test_app/presentation/home_page/bloc/events.dart';
+import 'package:flutter_test_app/presentation/home_page/bloc/state.dart';
 
 import '../../domain/models/card.dart';
 import '../details_page/MangaDetails.dart';
@@ -16,15 +20,14 @@ class WidgetBody extends StatefulWidget {
 }
 
 class _WidgetBodyState extends State<WidgetBody> {
-  final MangaRepository repo = MangaRepository();
   final TextEditingController searchController = TextEditingController();
-
-  late Future<List<CardData>?> data;
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeBloc>().add(const HomeLoadDataEvent());
+    });
     super.initState();
-    data = repo.loadData();
   }
 
   @override
@@ -66,35 +69,33 @@ class _WidgetBodyState extends State<WidgetBody> {
             child: CupertinoSearchTextField(
               controller: searchController,
               onSubmitted: (search) {
-                setState(() {
-                  data = repo.loadData(query: search);
-                });
+                setState(() {});
               },
             ),
           ),
         ),
         Expanded(
           child: Center(
-            child: FutureBuilder(
-              future: data,
-              builder: (context, asyncSnapshot) {
-                return SingleChildScrollView(
-                  child: asyncSnapshot.hasData
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: asyncSnapshot.data!
-                              .map(
-                                (data) => _Card.fromData(
-                                  data,
-                                  onLike: showSnackBar,
-                                  onTap: () => _navToDetails(context, data),
-                                ),
-                              )
-                              .toList(),
-                        )
-                      : const CircularProgressIndicator(),
-                );
-              },
+            child: BlocBuilder<HomeBloc, HomeState>(
+              builder: (BuildContext context, state) =>
+                  FutureBuilder<List<CardData>?>(
+                    future: state.data,
+                    builder: (context, snapshot) => snapshot.hasData
+                        ? ListView.builder(
+                            itemBuilder: (context, index) {
+                              final data = snapshot.data?[index];
+                              return data != null
+                                  ? _Card.fromData(
+                                      data,
+                                      onLike: (context, title, isLiked) =>
+                                          showSnackBar(context, title, isLiked),
+                                      onTap: () => _navToDetails(context, data),
+                                    )
+                                  : const SizedBox.shrink();
+                            },
+                          )
+                        : const CircularProgressIndicator(),
+                  ),
             ),
           ),
         ),
