@@ -1,7 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_test_app/presentation/home_page/bloc/bloc.dart';
 import 'package:flutter_test_app/presentation/home_page/home_page.dart';
+
+import 'data/repositories/manga_repository.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +21,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Manga App. Supported by MangaDex API'),
+      home: RepositoryProvider<MangaRepository>(
+        lazy: true,
+        create: (_) => MangaRepository(),
+        child: BlocProvider<HomeBloc>(
+          lazy: false,
+          create: (BuildContext context) =>
+              HomeBloc(context.read<MangaRepository>()),
+          child: const MyHomePage(
+            title: 'Manga App. Supported by MangaDex API',
+          ),
+        ),
+      ),
     );
   }
 }
