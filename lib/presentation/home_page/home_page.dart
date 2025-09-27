@@ -28,6 +28,12 @@ class _WidgetBodyState extends State<WidgetBody> {
   }
 
   @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     void showSnackBar(BuildContext context, String title, bool isLiked) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
