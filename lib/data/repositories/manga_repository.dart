@@ -17,12 +17,12 @@ class MangaRepository extends ApiInterface {
     OnErrorCallback? onError,
     String? query,
     int page = 0,
-    int limit = 4,
+    int limit = 5,
   }) async {
     try {
       final queryParams = {
         'limit': limit,
-        'offset': page,
+        'offset': page * limit,
         'includedTagsMode': 'AND',
         'excludedTagsMode': 'OR',
         'contentRating[]': ['safe'],
@@ -41,7 +41,8 @@ class MangaRepository extends ApiInterface {
       );
       final homeData = dto.toDomain();
       return homeData;
-    } on Exception catch (e) {
+    } on DioException catch (e) {
+      onError?.call(e.error?.toString());
       return null;
     }
   }

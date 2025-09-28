@@ -21,8 +21,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     } else {
       emit(state.copyWith(isPaginationLoading: true));
     }
-
-    final data = await repo.loadData(query: event.search, page: event.offset);
+    String? error;
+    final data = await repo.loadData(
+      query: event.search,
+      page: event.offset,
+      onError: (e) => error = e,
+    );
     if (event.offset != 0) {
       final oldData = state.data?.data ?? [];
       final newData = data?.data ?? [];
@@ -33,6 +37,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ?..clear()
         ..addAll(oldData)
         ..addAll(withoutFirst as Iterable<CardData>);
+      data?.data?.toSet().toList();
     }
 
     emit(
@@ -41,6 +46,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         isPaginationLoading: false,
         isLoading: false,
         offset: event.offset,
+        error: error,
       ),
     );
   }

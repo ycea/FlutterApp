@@ -98,7 +98,14 @@ class _WidgetBodyState extends State<WidgetBody> {
             ),
           ),
           BlocBuilder<HomeBloc, HomeState>(
-            builder: (context, state) => state.isLoading
+            builder: (context, state) => state.error != null
+                ? Text(
+                    state.error ?? "",
+                    style: Theme.of(
+                      context,
+                    ).textTheme.headlineSmall?.copyWith(color: Colors.red),
+                  )
+                : state.isLoading
                 ? const CircularProgressIndicator()
                 : Expanded(
                     child: RefreshIndicator(

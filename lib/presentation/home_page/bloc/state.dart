@@ -1,29 +1,23 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_test_app/domain/models/card.dart';
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter_test_app/domain/models/home.dart';
+part 'state.g.dart';
 
+@CopyWith()
 class HomeState extends Equatable {
   final HomeData? data;
   final bool isLoading;
   final bool isPaginationLoading;
   final int offset;
+  final String? error;
   const HomeState({
     this.data,
+    this.error,
     this.isLoading = false,
     this.isPaginationLoading = false,
     this.offset = 0,
   });
-  HomeState copyWith({
-    HomeData? data,
-    bool? isLoading,
-    bool? isPaginationLoading,
-    int? offset,
-  }) => HomeState(
-    data: data ?? this.data,
-    isLoading: isLoading ?? this.isLoading,
-    isPaginationLoading: isPaginationLoading ?? this.isPaginationLoading,
-    offset: offset ?? this.offset,
-  );
+
   @override
-  List<Object?> get props => [data, isLoading, isPaginationLoading];
+  List<Object?> get props => [data, isLoading, isPaginationLoading, error];
 }
