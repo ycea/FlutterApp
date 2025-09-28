@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_test_app/components/extensions/LocalContextX.dart';
 
 import '../../domain/models/card.dart';
 
@@ -43,7 +44,7 @@ class MangaDetail extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 15.0),
                 child: Text(
-                  "Описание",
+                  context.locale.description,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),

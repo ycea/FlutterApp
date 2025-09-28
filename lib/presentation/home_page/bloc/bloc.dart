@@ -12,10 +12,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeLoadDataEvent>(_onLoadData);
   }
 
-  Future<void> _onLoadData(
-    HomeLoadDataEvent event,
-    Emitter<HomeState> emit,
-  ) async {
+  Future<void> _onLoadData(HomeLoadDataEvent event, Emitter<HomeState> emit) async {
     if (event.offset == 0) {
       emit(state.copyWith(isLoading: true));
     } else {

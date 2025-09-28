@@ -1,12 +1,14 @@
 part of '../../presentation/home_page/home_page.dart';
 
-class _Card extends StatefulWidget {
+class _Card extends StatelessWidget {
   final String name;
   final IconData icon;
   final String? imageUrl;
   final OnLikeCallBack? onLike;
   final String? description;
   final VoidCallback? onTap;
+  final bool isLiked;
+  final String? id;
   const _Card(
     this.name, {
     this.description,
@@ -14,11 +16,14 @@ class _Card extends StatefulWidget {
     this.imageUrl,
     this.onLike,
     this.onTap,
+    this.id,
+    this.isLiked = false,
   });
   factory _Card.fromData(
     CardData data, {
     OnLikeCallBack? onLike,
     VoidCallback? onTap,
+    bool isLiked = false,
   }) => _Card(
     data.name,
     icon: data.icon,
@@ -26,18 +31,14 @@ class _Card extends StatefulWidget {
     onLike: onLike,
     description: data.description,
     onTap: onTap,
+    isLiked: isLiked,
+    id: data.id,
   );
 
   @override
-  State<_Card> createState() => _CardState();
-}
-
-class _CardState extends State<_Card> {
-  bool isLiked = false;
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.all(20),
         padding: const EdgeInsets.only(top: 16, bottom: 10, left: 1, right: 1),
@@ -70,10 +71,7 @@ class _CardState extends State<_Card> {
                       alignment: Alignment.topRight,
                       child: GestureDetector(
                         onTap: () {
-                          setState(() {
-                            isLiked = !isLiked;
-                          });
-                          widget.onLike?.call(widget.name, isLiked);
+                          onLike?.call(id, name, isLiked);
                         },
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 400),
@@ -103,7 +101,7 @@ class _CardState extends State<_Card> {
                         width: 300,
                         height: 300,
                         child: Image.network(
-                          widget.imageUrl ?? "",
+                          imageUrl ?? "",
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => const Placeholder(),
                         ),
@@ -112,7 +110,7 @@ class _CardState extends State<_Card> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        widget.name,
+                        name,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.headlineLarge,
                       ),

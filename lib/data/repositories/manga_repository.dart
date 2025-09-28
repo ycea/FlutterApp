@@ -1,9 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test_app/data/dtos/mangas_dto.dart';
-import 'package:flutter_test_app/data/mappers/MangaDtoToModelMapper.dart';
 import 'package:flutter_test_app/data/mappers/MangasDtoToModel.dart';
 import 'package:flutter_test_app/data/repositories/api_interface.dart';
-import 'package:flutter_test_app/domain/models/card.dart';
 import 'package:flutter_test_app/domain/models/home.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
@@ -36,9 +34,7 @@ class MangaRepository extends ApiInterface {
         url,
         queryParameters: queryParams,
       );
-      final MangasDto dto = MangasDto.fromJson(
-        response.data as Map<String, dynamic>,
-      );
+      final MangasDto dto = MangasDto.fromJson(response.data as Map<String, dynamic>);
       final homeData = dto.toDomain();
       return homeData;
     } on DioException catch (e) {

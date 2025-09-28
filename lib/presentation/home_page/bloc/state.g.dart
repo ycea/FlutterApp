@@ -17,51 +17,53 @@ abstract class _$HomeStateCWProxy {
 
   HomeState offset(int offset);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `HomeState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `HomeState(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// HomeState(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   HomeState call({
     HomeData? data,
     String? error,
-    bool? isLoading,
-    bool? isPaginationLoading,
-    int? offset,
+    bool isLoading,
+    bool isPaginationLoading,
+    int offset,
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfHomeState.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfHomeState.copyWith.fieldName(...)`
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfHomeState.copyWith(...)` or call `instanceOfHomeState.copyWith.fieldName(value)` for a single field.
 class _$HomeStateCWProxyImpl implements _$HomeStateCWProxy {
   const _$HomeStateCWProxyImpl(this._value);
 
   final HomeState _value;
 
   @override
-  HomeState data(HomeData? data) => this(data: data);
+  HomeState data(HomeData? data) => call(data: data);
 
   @override
-  HomeState error(String? error) => this(error: error);
+  HomeState error(String? error) => call(error: error);
 
   @override
-  HomeState isLoading(bool isLoading) => this(isLoading: isLoading);
+  HomeState isLoading(bool isLoading) => call(isLoading: isLoading);
 
   @override
   HomeState isPaginationLoading(bool isPaginationLoading) =>
-      this(isPaginationLoading: isPaginationLoading);
+      call(isPaginationLoading: isPaginationLoading);
 
   @override
-  HomeState offset(int offset) => this(offset: offset);
+  HomeState offset(int offset) => call(offset: offset);
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `HomeState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `HomeState(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// HomeState(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   HomeState call({
     Object? data = const $CopyWithPlaceholder(),
     Object? error = const $CopyWithPlaceholder(),
@@ -84,10 +86,10 @@ class _$HomeStateCWProxyImpl implements _$HomeStateCWProxy {
           : isLoading as bool,
       isPaginationLoading:
           isPaginationLoading == const $CopyWithPlaceholder() ||
-                  isPaginationLoading == null
-              ? _value.isPaginationLoading
-              // ignore: cast_nullable_to_non_nullable
-              : isPaginationLoading as bool,
+              isPaginationLoading == null
+          ? _value.isPaginationLoading
+          // ignore: cast_nullable_to_non_nullable
+          : isPaginationLoading as bool,
       offset: offset == const $CopyWithPlaceholder() || offset == null
           ? _value.offset
           // ignore: cast_nullable_to_non_nullable
@@ -97,7 +99,8 @@ class _$HomeStateCWProxyImpl implements _$HomeStateCWProxy {
 }
 
 extension $HomeStateCopyWith on HomeState {
-  /// Returns a callable class that can be used as follows: `instanceOfHomeState.copyWith(...)` or like so:`instanceOfHomeState.copyWith.fieldName(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfHomeState.copyWith(...)` or `instanceOfHomeState.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
   _$HomeStateCWProxy get copyWith => _$HomeStateCWProxyImpl(this);
 }

@@ -1,0 +1,12 @@
+{
+    "@@locale": "ru",
+
+    "search": "Поиск",
+    "liked": "в избранное!",
+    "disliked": "не в избранном :(",
+    "titleAppBar": "Приложение Manga. Поддержка API MangaDex",
+    "titleApp": "Демонстрация Flutter",
+    "description": "описание",
+    "manga":"Манга",
+    "arbEnding": "Чтобы не забыть про отсутствие запятой :)"
+}

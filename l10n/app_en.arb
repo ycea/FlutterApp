@@ -1,0 +1,12 @@
+{
+  "@@locale": "en",
+  "search": "Search",
+  "liked": "liked!",
+  "disliked": "disliked :(",
+  "titleAppBar": "Manga App. Supported by MangaDex API",
+  "titleApp": "Flutter Demo",
+  "description": "description",
+  "manga":"Manga",
+
+  "arbEnding": "Чтобы не забыть про отсутствие запятой :)"
+}

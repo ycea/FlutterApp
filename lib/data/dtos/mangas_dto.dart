@@ -8,8 +8,7 @@ class MangasDto {
   final int offset;
   const MangasDto({this.data, this.offset = 0});
 
-  factory MangasDto.fromJson(Map<String, dynamic> json) =>
-      _$MangasDtoFromJson(json);
+  factory MangasDto.fromJson(Map<String, dynamic> json) => _$MangasDtoFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -18,16 +17,12 @@ class MangaDto {
   final String? type;
   final MangaAttributesDto? attributes;
   final List<RelationshipDto>? relationships;
-  String? get title =>
-      attributes?.title?['en'] ?? attributes?.title?['ja-ro'] ?? "UNKNOWN";
+  String? get title => attributes?.title?['en'] ?? attributes?.title?['ja-ro'] ?? "UNKNOWN";
   String? get description =>
-      attributes?.description?['en'] ??
-      attributes?.description?['ja'] ??
-      "UNKNOWN";
+      attributes?.description?['en'] ?? attributes?.description?['ja'] ?? "UNKNOWN";
   const MangaDto({this.id, this.type, this.attributes, this.relationships});
 
-  factory MangaDto.fromJson(Map<String, dynamic> json) =>
-      _$MangaDtoFromJson(json);
+  factory MangaDto.fromJson(Map<String, dynamic> json) => _$MangaDtoFromJson(json);
 
   RelationshipDto? get coverImageRelationship {
     if (relationships == null) return null;
@@ -63,8 +58,7 @@ class RelationshipDto {
 
   const RelationshipDto({this.id, this.type, required this.attributes});
 
-  factory RelationshipDto.fromJson(Map<String, dynamic> json) =>
-      _$RelationshipDtoFromJson(json);
+  factory RelationshipDto.fromJson(Map<String, dynamic> json) => _$RelationshipDtoFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)

@@ -1,4 +1,3 @@
-import 'package:flutter_test_app/domain/models/card.dart';
 import 'package:flutter_test_app/domain/models/home.dart';
 
 abstract class ApiInterface {

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-typedef OnLikeCallBack = void Function(String title, bool isLiked)?;
+typedef OnLikeCallBack = void Function(String? id, String title, bool isLiked)?;
 
 class CardData {
   final String name;
-  final IconData icon; // for the future update
+  final IconData icon;
   final String? imageUrl;
   final String? description;
+  final String? id;
   final OnLikeCallBack? onLike;
   const CardData(
     this.name, {
@@ -14,5 +15,6 @@ class CardData {
     this.onLike,
     this.description,
     this.icon = Icons.ac_unit_outlined,
+    this.id,
   });
 }

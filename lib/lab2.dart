@@ -1,5 +1,5 @@
 void main() async {
-  SequenceGenerator seq = new SequenceGenerator(12, -1);
+  SequenceGenerator seq = SequenceGenerator(12, -1);
   await seq.generate(10);
   print(seq.sum);
   switch (seq.getSequenceType()) {

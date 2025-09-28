@@ -1,21 +1,28 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_test_app/data/repositories/manga_repository.dart';
-import 'package:flutter_test_app/data/repositories/mock_repository.dart';
+import 'package:flutter_test_app/presentation/common/svg_objects.dart';
 import 'package:flutter_test_app/presentation/home_page/bloc/bloc.dart';
 import 'package:flutter_test_app/presentation/home_page/bloc/events.dart';
 import 'package:flutter_test_app/presentation/home_page/bloc/state.dart';
 
+import 'package:flutter_test_app/domain/models/card.dart';
+import 'package:flutter_test_app/presentation/like_bloc/like_state.dart';
+import '../../components/extensions/LocalContextX.dart';
+import '../../components/locale/l10n/app_locale.dart';
 import '../../components/utils/Debounce.dart';
-import '../../domain/models/card.dart';
 import '../details_page/MangaDetails.dart';
+import '../like_bloc/like_bloc.dart';
+import '../like_bloc/like_event.dart';
+import '../locale_bloc/locale_bloc.dart';
+import '../locale_bloc/locale_events.dart';
+import '../locale_bloc/locale_state.dart';
 
 part './card.dart';
 
 class WidgetBody extends StatefulWidget {
+  const WidgetBody({super.key});
+
   @override
   State<WidgetBody> createState() => _WidgetBodyState();
 }
@@ -25,9 +32,11 @@ class _WidgetBodyState extends State<WidgetBody> {
   final scrollController = ScrollController();
   @override
   void initState() {
+    SvgObjects.init();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HomeBloc>().add(const HomeLoadDataEvent());
     });
+    context.read<LikeBloc>().add(const LoadLikesEvent());
     scrollController.addListener(_onNextPageListener);
     super.initState();
   }
@@ -73,7 +82,9 @@ class _WidgetBodyState extends State<WidgetBody> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Манга $title ${isLiked ? 'добавлена в избранное' : 'убрана из избранного'}!',
+            !isLiked
+                ? '${context.locale.manga} $title ${context.locale.liked}'
+                : '${context.locale.manga} $title ${AppLocale.of(context)?.disliked}',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           backgroundColor: Colors.orangeAccent,
@@ -89,19 +100,44 @@ class _WidgetBodyState extends State<WidgetBody> {
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: CupertinoSearchTextField(
-              controller: searchController,
-              onChanged: (search) {
-                Debounce.run(
-                  () => context.read<HomeBloc>().add(
-                    HomeLoadDataEvent(search: search),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: CupertinoSearchTextField(
+                    controller: searchController,
+                    placeholder: context.locale.search,
+                    onChanged: (search) {
+                      Debounce.run(
+                        () => context.read<HomeBloc>().add(
+                          HomeLoadDataEvent(search: search),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () =>
+                    context.read<LocaleBloc>().add(const ChangeLocaleEvent()),
+                child: SizedBox.square(
+                  dimension: 50,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: BlocBuilder<LocaleBloc, LocaleState>(
+                      builder: (context, state) {
+                        return state.currentLocale.languageCode == "ru"
+                            ? const SvgRu()
+                            : const SvgUK();
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+
           BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) => state.error != null
                 ? Text(
@@ -112,26 +148,34 @@ class _WidgetBodyState extends State<WidgetBody> {
                   )
                 : state.isLoading
                 ? const CircularProgressIndicator()
-                : Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: _onRefresh,
-                      child: ListView.builder(
-                        controller: scrollController,
-                        padding: EdgeInsets.zero,
-                        itemCount: state.data?.data?.length ?? 0,
-                        itemBuilder: (context, index) {
-                          final data = state.data?.data?[index];
-                          return data != null
-                              ? _Card.fromData(
-                                  data,
-                                  onLike: (title, isLiked) =>
-                                      showSnackBar(context, title, isLiked),
-                                  onTap: () => _navToDetails(context, data),
-                                )
-                              : const SizedBox.shrink();
-                        },
-                      ),
-                    ),
+                : BlocBuilder<LikeBloc, LikeState>(
+                    builder: (BuildContext context, LikeState likeState) {
+                      return Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: _onRefresh,
+                          child: ListView.builder(
+                            controller: scrollController,
+                            padding: EdgeInsets.zero,
+                            itemCount: state.data?.data?.length ?? 0,
+                            itemBuilder: (context, index) {
+                              final data = state.data?.data?[index];
+                              return data != null
+                                  ? _Card.fromData(
+                                      data,
+                                      onLike: _onLike,
+                                      isLiked:
+                                          likeState.likedIds?.contains(
+                                            data.id,
+                                          ) ==
+                                          true,
+                                      onTap: () => _navToDetails(context, data),
+                                    )
+                                  : const SizedBox.shrink();
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   ),
           ),
           BlocBuilder<HomeBloc, HomeState>(
@@ -142,5 +186,12 @@ class _WidgetBodyState extends State<WidgetBody> {
         ],
       ),
     );
+  }
+
+  void _onLike(String? id, String title, bool isLiked) {
+    if (id != null) {
+      context.read<LikeBloc>().add(ChangeLikeEvent(id));
+      showSnackBar(context, title, isLiked);
+    }
   }
 }
