@@ -18,12 +18,11 @@ class MangaDto {
   final String? type;
   final MangaAttributesDto? attributes;
   final List<RelationshipDto>? relationships;
-  // Вспомогательные геттеры
   String? get title =>
       attributes?.title?['en'] ?? attributes?.title?['ja-ro'] ?? "UNKNOWN";
   String? get description =>
       attributes?.description?['en'] ??
-      attributes?.title?['ja-ro'] ??
+      attributes?.description?['ja'] ??
       "UNKNOWN";
   const MangaDto({this.id, this.type, this.attributes, this.relationships});
 

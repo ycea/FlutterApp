@@ -9,6 +9,7 @@ import 'package:flutter_test_app/presentation/home_page/bloc/bloc.dart';
 import 'package:flutter_test_app/presentation/home_page/bloc/events.dart';
 import 'package:flutter_test_app/presentation/home_page/bloc/state.dart';
 
+import '../../components/utils/Debounce.dart';
 import '../../domain/models/card.dart';
 import '../details_page/MangaDetails.dart';
 
@@ -92,8 +93,12 @@ class _WidgetBodyState extends State<WidgetBody> {
             padding: const EdgeInsets.all(12),
             child: CupertinoSearchTextField(
               controller: searchController,
-              onSubmitted: (search) {
-                context.read<HomeBloc>().add(HomeLoadDataEvent(search: search));
+              onChanged: (search) {
+                Debounce.run(
+                  () => context.read<HomeBloc>().add(
+                    HomeLoadDataEvent(search: search),
+                  ),
+                );
               },
             ),
           ),
