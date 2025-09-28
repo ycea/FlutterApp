@@ -5,7 +5,9 @@ part 'mangas_dto.g.dart';
 @JsonSerializable(createToJson: false)
 class MangasDto {
   final List<MangaDto>? data;
-  const MangasDto({this.data});
+  final int? offset;
+  const MangasDto({this.data, this.offset});
+
   factory MangasDto.fromJson(Map<String, dynamic> json) =>
       _$MangasDtoFromJson(json);
 }

@@ -69,7 +69,7 @@ class _WidgetBodyState extends State<WidgetBody> {
             child: CupertinoSearchTextField(
               controller: searchController,
               onSubmitted: (search) {
-                setState(() {});
+                context.read<HomeBloc>().add(HomeLoadDataEvent(search: search));
               },
             ),
           ),
@@ -82,6 +82,7 @@ class _WidgetBodyState extends State<WidgetBody> {
                     future: state.data,
                     builder: (context, snapshot) => snapshot.hasData
                         ? ListView.builder(
+                            itemCount: snapshot.data?.length ?? 0,
                             itemBuilder: (context, index) {
                               final data = snapshot.data?[index];
                               return data != null
