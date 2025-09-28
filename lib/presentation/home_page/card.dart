@@ -73,7 +73,7 @@ class _CardState extends State<_Card> {
                           setState(() {
                             isLiked = !isLiked;
                           });
-                          widget.onLike?.call(context, widget.name, isLiked);
+                          widget.onLike?.call(widget.name, isLiked);
                         },
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 400),

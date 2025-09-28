@@ -1,5 +1,8 @@
 import 'package:flutter_test_app/domain/models/card.dart';
+import 'package:flutter_test_app/domain/models/home.dart';
 
 abstract class ApiInterface {
-  Future<List<CardData>?> loadData({String? query});
+  Future<HomeData?> loadData({OnErrorCallback? onError});
 }
+
+typedef OnErrorCallback = void Function(String? error);

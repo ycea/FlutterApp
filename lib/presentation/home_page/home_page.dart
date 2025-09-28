@@ -21,51 +21,75 @@ class WidgetBody extends StatefulWidget {
 
 class _WidgetBodyState extends State<WidgetBody> {
   final TextEditingController searchController = TextEditingController();
-
+  final scrollController = ScrollController();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HomeBloc>().add(const HomeLoadDataEvent());
     });
+    scrollController.addListener(_onNextPageListener);
     super.initState();
+  }
+
+  void _onNextPageListener() {
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent) {
+      final bloc = context.read<HomeBloc>();
+      if (!bloc.state.isPaginationLoading) {
+        bloc.add(
+          HomeLoadDataEvent(
+            search: searchController.text,
+            offset: bloc.state.offset + 1,
+          ),
+        );
+      }
+    }
   }
 
   @override
   void dispose() {
     searchController.dispose();
+    scrollController.dispose();
     super.dispose();
+  }
+
+  void _navToDetails(BuildContext context, CardData cardData) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MangaDetail(cardData)),
+    );
+  }
+
+  Future<void> _onRefresh() async {
+    context.read<HomeBloc>().add(
+      HomeLoadDataEvent(search: searchController.text),
+    );
+    return Future.value(null);
+  }
+
+  void showSnackBar(BuildContext context, String title, bool isLiked) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Манга $title ${isLiked ? 'добавлена в избранное' : 'убрана из избранного'}!',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          backgroundColor: Colors.orangeAccent,
+          duration: const Duration(milliseconds: 500),
+        ),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    void showSnackBar(BuildContext context, String title, bool isLiked) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Манга $title ${isLiked ? 'добавлена в избранное' : 'убрана из избранного'}!',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            backgroundColor: Colors.orangeAccent,
-            duration: const Duration(milliseconds: 500),
-          ),
-        );
-      });
-    }
-
-    void _navToDetails(BuildContext context, CardData cardData) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MangaDetail(cardData)),
-      );
-    }
-
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
+    return Padding(
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
             child: CupertinoSearchTextField(
               controller: searchController,
               onSubmitted: (search) {
@@ -73,34 +97,38 @@ class _WidgetBodyState extends State<WidgetBody> {
               },
             ),
           ),
-        ),
-        Expanded(
-          child: Center(
-            child: BlocBuilder<HomeBloc, HomeState>(
-              builder: (BuildContext context, state) =>
-                  FutureBuilder<List<CardData>?>(
-                    future: state.data,
-                    builder: (context, snapshot) => snapshot.hasData
-                        ? ListView.builder(
-                            itemCount: snapshot.data?.length ?? 0,
-                            itemBuilder: (context, index) {
-                              final data = snapshot.data?[index];
-                              return data != null
-                                  ? _Card.fromData(
-                                      data,
-                                      onLike: (context, title, isLiked) =>
-                                          showSnackBar(context, title, isLiked),
-                                      onTap: () => _navToDetails(context, data),
-                                    )
-                                  : const SizedBox.shrink();
-                            },
-                          )
-                        : const CircularProgressIndicator(),
+          BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) => state.isLoading
+                ? const CircularProgressIndicator()
+                : Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      child: ListView.builder(
+                        controller: scrollController,
+                        padding: EdgeInsets.zero,
+                        itemCount: state.data?.data?.length ?? 0,
+                        itemBuilder: (context, index) {
+                          final data = state.data?.data?[index];
+                          return data != null
+                              ? _Card.fromData(
+                                  data,
+                                  onLike: (title, isLiked) =>
+                                      showSnackBar(context, title, isLiked),
+                                  onTap: () => _navToDetails(context, data),
+                                )
+                              : const SizedBox.shrink();
+                        },
+                      ),
+                    ),
                   ),
-            ),
           ),
-        ),
-      ],
+          BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) => state.isPaginationLoading
+                ? const CircularProgressIndicator()
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
     );
   }
 }

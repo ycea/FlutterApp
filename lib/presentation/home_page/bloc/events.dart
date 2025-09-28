@@ -4,5 +4,6 @@ abstract class HomeEvent {
 
 class HomeLoadDataEvent extends HomeEvent {
   final String? search;
-  const HomeLoadDataEvent({this.search});
+  final int offset;
+  const HomeLoadDataEvent({this.search, this.offset = 0});
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-typedef OnLikeCallBack =
-    void Function(BuildContext context, String title, bool isLiked)?;
+typedef OnLikeCallBack = void Function(String title, bool isLiked)?;
 
 class CardData {
   final String name;
